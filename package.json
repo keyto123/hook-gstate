@@ -1,6 +1,6 @@
 {
   "name": "hook-gstate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A global state manager with hooks.",
   "main": "index.js",
   "repository": "https://github.com/keyto123/hooks-gstate",
