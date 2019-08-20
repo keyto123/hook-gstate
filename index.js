@@ -51,7 +51,6 @@ export function useSub(baseKey, keysAndPath) {
 
     const stateGet = {};
     mKeysAndPath.forEach(function(kp) {
-        console.log('kp:', kp)
         if(dotProp.get(gState, kp[1]) === undefined) {
             throw new Error('Trying to create new state variable');
         }
