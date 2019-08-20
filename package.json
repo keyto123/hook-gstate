@@ -8,6 +8,6 @@
   "license": "MIT",
   "dependencies": {
     "dot-prop-immutable": "^1.5.0",
-    "react": "^16.9.0"
+    "react": "^16.4.0"
   }
 }

@@ -37,21 +37,30 @@ export function createState(key, value) {
 export function update(kvs) {
     const updateKeys = [];
     kvs.forEach(function(kv) {
+        if(dotProp.get(gState, kv[0]) === undefined) {
+            throw new Error('Trying to create new state variable');
+        }
         gState = dotProp.set(gState, kv[0], kv[1]);
         updateKeys.push(kv[0]);
     });
     sub.update(updateKeys);
 }
 
-export function useSub(keysAndPath) {
+export function useSub(baseKey, keysAndPath) {
+    const mKeysAndPath = keysAndPath.map(kp => [kp[0], `${baseKey}.${kp[1]}`]);
+
     const stateGet = {};
-    keysAndPath.forEach(function(kp) {
+    mKeysAndPath.forEach(function(kp) {
+        console.log('kp:', kp)
+        if(dotProp.get(gState, kp[1]) === undefined) {
+            throw new Error('Trying to create new state variable');
+        }
         stateGet[kp[0]] = dotProp.get(gState, kp[1]);
     });
 
     const [state, update] = useState(stateGet);
     useEffect(function() {
-        const index = sub.subscribe(keysAndPath, update);
+        const index = sub.subscribe(mKeysAndPath, update);
         return function() {
             sub.unsubscribe(index);
         }
