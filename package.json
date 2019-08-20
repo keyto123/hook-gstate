@@ -1,0 +1,13 @@
+{
+  "name": "hook-gstate",
+  "version": "1.0.0",
+  "description": "A global state manager with hooks.",
+  "main": "index.js",
+  "repository": "https://github.com/keyto123/hooks-gstate",
+  "author": "Lucas Mateus",
+  "license": "MIT",
+  "dependencies": {
+    "dot-prop-immutable": "^1.5.0",
+    "react": "^16.9.0"
+  }
+}
