@@ -6,7 +6,7 @@
   "repository": "https://github.com/keyto123/hooks-gstate",
   "author": "Lucas Mateus",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "dot-prop-immutable": "^1.5.0",
     "react": "^16.8.0"
   }
