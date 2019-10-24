@@ -26,3 +26,8 @@ export function useSub(baseKey: string, kps: kp[]): object
  * Returns a deep copy of the global state
  */
 export function getState(): object
+
+/**
+ * Returns the value of a path in the state
+ */
+export function getFromPath(path: string): any
