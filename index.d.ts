@@ -1,5 +1,5 @@
-type kv = [string, any]
-type kp = [string, string]
+type kv = {[path: string]: any}
+type kp = {[path: string]: string}
 
 /**
  * Create a new state entry with default values
@@ -12,7 +12,7 @@ export function createState(key: string, value: object): void | never
  * Function used for updating global state
  * @param kvs array of keys and values [key, value]
  */
-export function update(kvs: kv[])
+export function update(keysAndValues: kv): void
 
 /**
  * Function used to subscribe a component to a set of global state paths
