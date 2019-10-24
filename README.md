@@ -1,6 +1,10 @@
 # hook-gstate
 A global state manager which associate paths to be used as dependecy levels, only updating components which are linked to the path changed
 
+*Important
+Whenever using path, must be a dot-prop-immutable path.
+path's example: 'object1.field', 'object1.object2.field', 'array.0'
+
 useRandom.js
 ```js{4-5}
 // State creating
@@ -14,14 +18,14 @@ createState('random', {
 // Here, update can be used to change multiple values with the style [path, value]
 const actions = {
     changeValue: function(newValue) {
-        update([
-            ['random.value', newValue]
-        ]);
+        update({
+            'random.value': newValue
+        );
     }
 }
 
 // keysAndPath represents the state definition the component will like to receive
-// an example is [ ['myRandom', 'random.value'] ]
+// an example is {'myRandom': 'random.value'}
 export default function useRandom(keysAndPath) {
     return [
         useSub('random', keysAndPath),
@@ -36,7 +40,7 @@ import React, { useCallback } from 'react';
 import useRandom from './useRandom';
 
 function MyComponent(props) {
-    const [{myRandom}, {changeValue}] = useRandom([ ['myRandom', 'value'] ]);
+    const [{myRandom}, {changeValue}] = useRandom({'myRandom': 'value'});
 
     const handleChange = useCallback(function() { changeValue(Math.random()); }, [changeValue]);
 

@@ -5,12 +5,12 @@ let gState = {};
 
 const subscriptionsHash = {};
 
-const sub = {
+const manager = {
     subscriptions: [],
-    subscribe: function(keysAndPath, update) {
-        this.subscriptions.push({keysAndPath, update});
-        keysAndPath.forEach(function(kp) {
-            const path = kp[1];
+    subscribe: function(keys, keysAndPath, update) {
+        this.subscriptions.push({keys, keysAndPath, update});
+        keys.forEach(function(key) {
+            const path = keysAndPath[key];
             if(path) {
                 if(!subscriptionsHash[path]) {
                     subscriptionsHash[path] = [];
@@ -22,12 +22,13 @@ const sub = {
     },
     unsubscribe: function(index) {
         const _sub = this.subscriptions[index];
-        _sub.keysAndPath.forEach(function(kp) {
-            subscriptionsHash[kp[1]] = subscriptionsHash[kp[1]].filter(function(sub2) {
+        _sub.keys.forEach(function(key) {
+            const path = _sub.keysAndPath[key];
+            subscriptionsHash[path] = subscriptionsHash[path].filter(function(sub2) {
                 return sub2.update !== _sub.update;
             });
-            if(subscriptionsHash[kp[1]].length === 0) {
-                delete subscriptionsHash[kp[1]];
+            if(subscriptionsHash[path].length === 0) {
+                delete subscriptionsHash[path];
             }
         });
         this.subscriptions = this.subscriptions.filter((s, i) => i !== index)
@@ -58,34 +59,40 @@ export function createState(key, value) {
     gState = dotProp.set(gState, `${key}`, value);
 }
 
-export function update(kvs) {
+export function update(pathsAndValues) {
     const updateKeys = [];
-    kvs.forEach(function(kv) {
-        if(dotProp.get(gState, kv[0]) === undefined) {
+
+    Object.keys(pathsAndValues).forEach(function(path) {
+        const value = pathsAndValues[path];
+        if(dotProp.get(gState, path) === undefined) {
             throw new Error('Trying to create new state variable');
         }
-        gState = dotProp.set(gState, kv[0], kv[1]);
-        updateKeys.push(kv[0]);
+        gState = dotProp.set(gState, path, value);
+        updateKeys.push(path);
     });
-    sub.update(updateKeys);
+    manager.update(updateKeys);
 }
 
 export function useSub(baseKey, keysAndPath) {
-    const mKeysAndPath = keysAndPath.map(kp => [kp[0], `${baseKey}.${kp[1]}`]);
+    const mKeysAndPath = {};
+    Object.keys(keysAndPath).forEach(function(key) {
+        mKeysAndPath[`${baseKey}.key`] = keysAndPath[key];
+    });
 
     const stateGet = {};
-    mKeysAndPath.forEach(function(kp) {
-        if(dotProp.get(gState, kp[1]) === undefined) {
+    const mKeys = Object.keys(mKeysAndPath).forEach(function(key) {
+        const path = mKeysAndPaths[key];
+        if(dotProp.get(gState, path) === undefined) {
             throw new Error('Trying to create new state variable');
         }
-        stateGet[kp[0]] = dotProp.get(gState, kp[1]);
+        stateGet[key] = dotProp.get(gState, path);
     });
 
     const [state, update] = useState(stateGet);
     useEffect(function() {
-        const index = sub.subscribe(mKeysAndPath, update);
+        const index = manager.subscribe(mKeys, mKeysAndPath, update);
         return function() {
-            sub.unsubscribe(index);
+            manager.unsubscribe(index);
         }
     }, []);
 
