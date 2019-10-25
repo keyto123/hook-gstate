@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import dotProp from 'dot-prop-immutable';
 
 let gState = {};
@@ -75,7 +75,7 @@ export function update(pathsAndValues) {
     manager.update(updateKeys);
 }
 
-export function useSub(baseKey, keysAndPath) {
+function computeState(baseKey, keysAndPath) {
     const mKeysAndPath = {};
     Object.keys(keysAndPath).forEach(function(key) {
         mKeysAndPath[key] = `${baseKey}.${keysAndPath[key]}`;
@@ -90,8 +90,17 @@ export function useSub(baseKey, keysAndPath) {
         }
         stateGet[key] = dotProp.get(gState, path);
     });
+    return { mKeys, mKeysAndPath, stateGet };
+};
 
+export function useSub(baseKey, keysAndPath) {
+    const { mKeys, mKeysAndPath, stateGet } = useMemo(function() {
+        return computeState(baseKey, keysAndPath);
+    },
+        [baseKey, keysAndPath]
+    );
     const [state, update] = useState(stateGet);
+
     useEffect(function() {
         const index = manager.subscribe(mKeys, mKeysAndPath, update);
         return function() {
